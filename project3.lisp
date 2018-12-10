@@ -1,5 +1,5 @@
 ; The maze that will be used for the ants to traverse (currently using grid-a)
-; The maze is using floating point nubmbers instead of -'s and x's so that we
+; The maze is using floating point numbers instead of -'s and x's so that we
 ; can better track the phereomone values in each cell of the maze.
 ;-1's represents represents the x's (the walls of the maze)
 ; 0's represent the empty cells
@@ -56,7 +56,7 @@
 )
 
 (defun aco ()
-  
+
 )
 
 (aco)
