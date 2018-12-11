@@ -1,3 +1,5 @@
+; GLOBAL VARIABLES
+
 ; The maze that will be used for the ants to traverse (currently using grid-a)
 ; The maze is using floating point numbers instead of -'s and x's so that we
 ; can better track the phereomone values in each cell of the maze.
@@ -47,15 +49,41 @@
       (0   0 -1 -1  0  0  0 -1  0  0  0  0  0  0  0  0 -1  0  0 -1  0  0  0  0  0 -1  0  0  0  0 -1  0  0  0  0  0  0  0 -1  0  0  0 -1  0  0  0  0  0  0 -1  0 -1  0 -1  0  0 -1 -1 -1  0)
       (0   0  0  0 -1  0  0 -1  0  0 -1 -1 -1 -1 -1 -1 -1 -1  0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1  0 -1 -1 -1 -1 -1 -1 -1  0  0  0  0  0  0)
       (0   0  0  0 -1  0  0 -1  0  0 -1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0))))
-(defvar *ants* (list))
+
+; A temporary test maze so that we don't have to work with a huge maze first
+(defvar *test_maze* (make-array '(4 4)
+  :element-type 'single-float
+  :initial-contents
+  '((0 0 -1 0)
+    (0 0 -1 0)
+    (0 0 -1 0)
+    (0 0  0 0))))
+
+; The list of ants that are currently in the maze
+(defvar *ants* '())
+
+; The list of ants that have reached the goal
 (defvar *reached_goal* 0)
 
+; The list of best paths from each ant that made it towards the goal
+(defvar *best_paths* '())
 
+
+
+
+;FUNCTIONS
+
+; Creates an ant ad the coordinate 0,0
 (defun create_ant ()
-
+    (setq *ants* (append *ants* (list '(0 0))))
 )
 
+; The main function of the ant colony project
 (defun aco ()
+  ;(loop while (*reached_goal* < 30) do)
+
+  ; USING FOR TESTING vvv  
+  ;(setf (nth 1 *ants*) (append (list (nth 1 *ants*) '(1 1))))
 
 )
 
