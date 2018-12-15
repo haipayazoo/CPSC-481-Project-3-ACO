@@ -63,6 +63,9 @@
 ; Each ant has the current path and whether or not they've reached the goal
 (defvar *ants* '())
 
+; A list of the ant's respective state of foraging or returning
+(defvar *foraging* '())
+
 ; The list of ants that have reached the goal
 (defvar *reached_goal* 0)
 
@@ -89,7 +92,10 @@
 
   ; Adds a new ant to the ant maze
   ; NIL means the ant has not reached the goal
-  (setq *ants* (append *ants* (list(list(list nil '(0 0))))))
+  (setq *ants* (append *ants* (list(list(list 0 0)))))
+
+  ; 0 means the ants are foraging, 1 means they are returning
+  (setq *foraging* (append *foraging* (list 0)))
 
   ; Initializes the tabu list of the new ant
   (setq *tabu_list* (append *tabu_list* (list(list(list 0 0)))))
@@ -121,8 +127,7 @@
       )
 
       ; Calls the heuristic function to find the best move
-      (setq best_move (heuristic_function candidates))
-
+      (setq best_move (heuristic_function candidates i))
 
   )
 
@@ -245,14 +250,89 @@
 
 )
 
-; The heurisitic function we will use to calculate the best candidate cell
+; The heurisitic function we will use to calculat e the best candidate cell
 ; for the ant to move
-(defun heuristic_function (candidates)
+(defun heuristic_function (candidates index)
 
-  (loop for i in candidates
+  (setq best_move_value -100)
+  (setq best_move '())
+
+  ; Loops for each candidate cell
+  (loop for candidate in candidates
     do
-      (print i)
+
+      ; This sets up the heuristic function formula to determine the winning
+      ; move
+      (setq mode_value (mode candidate index))
+      (setq scent_value (* *balance_factor* (aref *maze* (nth 0 candidate)(nth 1 candidate))))
+      (setq random_fuzz (float (/ (- (random 161) 80) 100.0)))
+      (setq heuristic_value (+ mode_value scent_value random_fuzz))
+
+      ; If the heuristic value calculated is better than the current
+      ; then replace it
+      (if (< best_move_value heuristic_value)
+
+        (progn
+
+          (setq best_move_value heuristic_value)
+          (setq best_move candidate)
+
+        )
+      )
   )
+
+  best_move
+)
+
+; Either gets deltamax if foraging or deltasum if returning
+(defun mode (candidate index)
+
+  ; If the ant is foraging we compute the deltamax
+  ; Delta max is the difference between the max of the candidate cell and
+  ; the ant's current cell
+  (if (= (nth index *foraging*) 0)
+
+    (progn
+      ; Acquires the max coordinate of the candidate cell
+      (if (> (nth 0 candidate) (nth 1 candidate))
+
+        (setq max_neighbor (nth 0 candidate))
+
+        (setq max_neighbor (nth 1 candidate))
+
+      )
+
+      ; Acquires the max coordinate of the ant's current cell
+      (if (> (nth 0 (nth index *ant_locations*)) (nth 1 (nth index *ant_locations*)))
+
+        (setq max_current (nth 0 (nth index *ant_locations*)))
+
+        (setq max_current (nth 1 (nth index *ant_locations*)))
+
+      )
+
+      (setq mode (- max_current max_neighbor))
+
+    )
+
+  )
+
+  ; If the returning than we compute the deltasum
+  ; The deltasum is the difference between the sum of the candidate cell and
+  ; the ant's current cell
+  (if (= (nth index *foraging*) 1)
+
+    (progn
+
+      (setq candidate_sum (+ (nth 0 candidate)(nth 1 candidate)))
+      (setq current_sum (+ (nth 0 (nth index *ant_locations*)) (nth 1 (nth index *ant_locations*))))
+      (setq mode (- candidate_sum current_sum))
+    )
+
+  )
+
+  mode
+
 )
 
 ; The main function of the ant colony project
