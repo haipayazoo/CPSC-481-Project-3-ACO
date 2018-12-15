@@ -66,17 +66,14 @@
 ; A list of the ant's respective state of foraging or returning
 (defvar *foraging* '())
 
-; The list of ants that have reached the goal
-(defvar *reached_goal* 0)
-
-; The list of best paths from each ant that made it towards the goal
-(defvar *best_paths* '())
-
 ; The tabu list of each ants
 (defvar *tabu_list* '())
 
 ; This holds a list of each ant's current location
 (defvar *ant_locations* (list))
+
+; The list of ants that have reached the goal
+(defvar *reached_goal* 0)
 
 ; Some of the parameters specified in the project
 (defvar *scent_drop* 10)
@@ -117,6 +114,7 @@
 
       ; If there are no valid moves, then the ant is completely stuck
       ; We need to wipe the tabu list of that ant so that it may continue
+      ; We retry valid_moves function afterwards
       (if (= (list-length candidates) 0)
 
         (progn
@@ -129,8 +127,37 @@
       ; Calls the heuristic function to find the best move
       (setq best_move (heuristic_function candidates i))
 
-  )
+      ; Moves the ants' current location
+      (replace (nth i *ant_locations*) best_move)
 
+      ; Appends the move to the ant's path taken so far
+      (setf (nth i *ants*) (append (nth i *ants*) (list best_move)))
+
+      ; If the tabu list has reached the tabu limit, then it is emptied
+      (if (> (list-length (nth i *tabu_list*)) *tabu_limit*)
+
+        (replace (nth i *tabu_list*) '())
+
+      )
+
+      ; Adds the move to the tabu list
+      (setf (nth i *tabu_list*) (append (nth i *tabu_list*) (list best_move)))
+
+      ; Check to see if the ant has reached the goal
+      (if (and (= (nth 0 (nth i *ant_locations*)) 40)
+               (= (nth 1 (nth i *ant_locations*)) 60))
+
+              (progn
+
+                 ; The goal counter is incremented by one
+                 (setq *reached_goal* (+ *reached_goal* 1))
+
+                 ; Ant switching from foraging to returning
+                 (replace (nth i *foraging*) 1)
+
+              )
+      )
+    )
 )
 
 ; Finds valid moves based on location of ant, tabu list, and maze walls
@@ -342,14 +369,14 @@
   (create_ant)
 
   ; Main iteration loop that continues until 30 ants have reached the goal
-  ;loop while (*reached_goal* < 30) do
+  ; NOTE: CHANGE THIS TO 30 WHEN DONE.
+  (loop while (< *reached_goal* 1) do
 
     (move_ant)
 
-  ;)
+    (create_ant)
+  )
 
-  ; USING FOR TESTING vvv
-  ;(setf (nth 1 *ants*) (append (list (nth 1 *ants*) '(1 1))))
 
 )
 
