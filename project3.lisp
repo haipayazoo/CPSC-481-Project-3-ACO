@@ -1,3 +1,18 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Authors: 		Cameron Mathos - cmathos@csu.fullerton.edu
+;				      John Shelton - john.shelton789@csu.fullerton.edu
+;           	Christopher Bos - cbos95@csu.fullerton.edu
+;
+;Team Name: 	CCJ
+;
+;Description: This project is to simulate an ant colony by using a heuristic
+;             function so that the any may move through a maze. The program
+;             will spawn up to 50 ants that will navigate from the top left
+;             to the bottom right of the maze. Once the ant makes it to the end,
+;             he returns to the maze dropping a scent that will spread
+;             throughout the maze. After 30 ants make it to the maze, they will
+;             display the shortest path to the maze.
+
 ; GLOBAL VARIABLES
 
 ; The maze that will be used for the ants to traverse (currently using grid-a)
@@ -50,14 +65,6 @@
       (0   0  0  0 -1  0  0 -1  0  0 -1 -1 -1 -1 -1 -1 -1 -1  0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1  0 -1 -1 -1 -1 -1 -1 -1  0  0  0  0  0  0)
       (0   0  0  0 -1  0  0 -1  0  0 -1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0))))
 
-; A temporary test maze so that we don't have to work with a huge maze first
-(defvar *test_maze* (make-array '(4 4)
-  :element-type 'single-float
-  :initial-contents
-  '((0 0 -1 0)
-    (0 0 -1 0)
-    (0 0 -1 0)
-    (0 0  0 0))))
 
 ; The list of ants that are currently in the maze
 ; Each ant has the current path and whether or not they've reached the goal
@@ -362,6 +369,23 @@
 
 )
 
+; Acquires the shortest path from the ants that have finished
+(defun shortest_list()
+
+  (setq shortest_path '())
+
+  (loop for i from 0 to (list-length *ants*) do
+
+    (if (> (list-length (nth i *ants*)) (list-length shortest_path))
+      (setq shortest_path (nth i *ants*))
+    )
+
+  )
+
+  (print shortest_path)
+
+)
+
 ; The main function of the ant colony project
 (defun aco ()
 
@@ -369,12 +393,19 @@
   (create_ant)
 
   ; Main iteration loop that continues until 30 ants have reached the goal
-  ; NOTE: CHANGE THIS TO 30 WHEN DONE.
-  (loop while (< *reached_goal* 1) do
+  (loop while (< *reached_goal* 30) do
 
+    ; Moves each ant
     (move_ant)
 
-    (create_ant)
+    ; If the length of the ant is less than 50 than spawn another ant
+    (if (< (list-length *ant_locations*) 50)
+      (create_ant)
+    )
+
+
+    (shortest_list)
+
   )
 
 
